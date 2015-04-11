@@ -1,14 +1,30 @@
 <?php
 
+Route::get('/', function() {
+    if(Auth::check()){
+        return Redirect::to('/profile');
+    }
+    return View::make('general.login');
+});
+Route::get('/profile',array('before' => 'auth', function() {
+    return View::make('perfil.perfil')
+                    ->with("nombre",Auth::user()->nombre);
+}));
 
-Route::get('/', function()
-{
-	return View::make('hello');
+Route::post('/loguear', function() {
+    $email = Input::get('correo');
+    $password = Input::get('password');
+
+    if (Auth::attempt(['correo' => $email, 'password' => $password])) {
+        return Redirect::to("/profile");
+    } else {
+        echo "el usuario no esta logueado";
+    }
+});
+Route::get('/logout', function() {
+Auth::logout();
+return Redirect::to("/");
 });
 
-Route::get('/prueba', function()
-{
-	return View::make('prueba');
-});
 
-Route::controller('personal','PersonalController');
+Route::controller('personal', 'PersonalController');
